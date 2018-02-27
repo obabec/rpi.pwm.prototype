@@ -9,7 +9,7 @@ public class Main {
 
         pwmUsage.initialize();
         pwmUsage.configPwm();
-        pwmUsage.setPin(18);
+        pwmUsage.setPin(12);
         pwmUsage.setFrequency(100000000);
         pwmUsage.setDuty(10000000);
         pwmUsage.enable();
