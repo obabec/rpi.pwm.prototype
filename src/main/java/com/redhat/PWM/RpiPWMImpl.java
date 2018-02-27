@@ -17,17 +17,7 @@ public class RpiPWMImpl implements RpiPWM {
         if (pin == null) {
             logger.warn("Pin is not selected!");
         } else {
-            File sourceTemplate = new File("./resources/pwm-2chan-with-clk-overlay.dtbo");
-            File destinationDirectory = new File("/boot/overlays");
-
-            try {
-                FileUtils.copyFileToDirectory(sourceTemplate,destinationDirectory);
-            } catch (IOException e) {
-                logger.warn("Error in copying overlay");
-                e.printStackTrace();
-            }
-
-            if (pin == 18) {
+            if (pin == 12) {
                 pathToControll = "/sys/class/pwm/pwmchip0/pwm0";
                             } else {
                 pathToControll = "/sys/class/pwm/pwmchip0/pwm1";
@@ -38,6 +28,16 @@ public class RpiPWMImpl implements RpiPWM {
 
     public void cleanUp() {
 
+        try {
+            Process p;
+            if (pin == 12) {
+                p = new ProcessBuilder("/bin/sh", "-c", "echo 0 > /sys/class/pwm/pwmchip0/unexport").start();
+            } else {
+                p = new ProcessBuilder("/bin/sh", "-c", "echo 1 > /sys/class/pwm/pwmchip0/unexport").start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setDuty(long duty) {
@@ -66,19 +66,17 @@ public class RpiPWMImpl implements RpiPWM {
 
     public void configPwm(){
 
-        Writer configWriter;
+        /*Writer configWriter*/;
         try {
-            configWriter = new BufferedWriter(new FileWriter("",true));
-            configWriter.append("dtoverlay=pwm-2chan,pin=" + pin + ",func=4");
-            configWriter.close();
-
-            configWriter = new BufferedWriter(new FileWriter("/sys/class/pwm/pwmchip0/export"));
-            if (pin == 18) {
-             configWriter.write(0);
+            /*configWriter = new BufferedWriter(new FileWriter("/boot/config.txt",true));
+            configWriter.append("dtoverlay=pwm");
+            configWriter.close();*/
+            Process p;
+            if (pin == 12) {
+                p = new ProcessBuilder("/bin/sh", "-c", "echo 0 > /sys/class/pwm/pwmchip0/export").start();
             } else {
-                configWriter.write(1);
+                p = new ProcessBuilder("/bin/sh", "-c", "echo 1 > /sys/class/pwm/pwmchip0/export").start();
             }
-            configWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
