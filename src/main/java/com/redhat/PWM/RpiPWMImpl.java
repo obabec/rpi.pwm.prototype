@@ -17,7 +17,7 @@ public class RpiPWMImpl implements RpiPWM {
         if (pin == null) {
             logger.warn("Pin is not selected!");
         } else {
-            File sourceTemplate = new File("./resources/pwm-2chan-with-clk-overlay.dts");
+            File sourceTemplate = new File("./resources/pwm-2chan-with-clk-overlay.dtbo");
             File destinationDirectory = new File("/boot/overlays");
 
             try {
