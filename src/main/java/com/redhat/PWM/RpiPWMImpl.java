@@ -22,7 +22,6 @@ public class RpiPWMImpl implements RpiPWM {
                             } else {
                 pathToControll = "/sys/class/pwm/pwmchip0/pwm1";
             }
-
         }
     }
 
@@ -66,11 +65,16 @@ public class RpiPWMImpl implements RpiPWM {
 
     public void configPwm(){
 
-        /*Writer configWriter*/;
+
         try {
-            /*configWriter = new BufferedWriter(new FileWriter("/boot/config.txt",true));
-            configWriter.append("dtoverlay=pwm");
-            configWriter.close();*/
+            File f = new File("/boot/config.txt");
+            String config = "dtoverlay=pwm";
+            if (checkFileConf(f,config)) {
+                Writer configWriter;
+                configWriter = new BufferedWriter(new FileWriter("/boot/config.txt",true));
+                configWriter.append("dtoverlay=pwm");
+                configWriter.close();
+            }
             Process p;
             if (pin == 12) {
                 p = new ProcessBuilder("/bin/sh", "-c", "echo 0 > /sys/class/pwm/pwmchip0/export").start();
@@ -95,5 +99,25 @@ public class RpiPWMImpl implements RpiPWM {
             e.printStackTrace();
         }
 
+    }
+
+    public Boolean checkFileConf(File file, String conf) {
+
+        int counter = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+               if (line.toLowerCase().equals(conf.toLowerCase())) {
+                   counter++;
+               }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (counter > 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
